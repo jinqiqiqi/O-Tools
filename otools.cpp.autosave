@@ -354,7 +354,7 @@ void OTools::on_EfsB_clicked()
       system("adb wait-for-device");
       system("adb shell 'dd if=/dev/block/mmcblk0p10 of=/sdcard/modemst1.bin bs=512'");
       system("adb shell 'dd if=/dev/block/mmcblk0p11 of=/sdcard/modemst2.bin bs=512'");
-          QMessageBox::information(this,tr("EFS Backup"),"Done!","OK");
+      QMessageBox::information(this,tr("EFS Backup"),"Done!","OK");
     }
 }
 
