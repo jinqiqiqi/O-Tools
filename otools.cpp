@@ -1,12 +1,15 @@
 #include "otools.h"
 #include "ui_otools.h"
+#include <stdlib.h>
+#include <QApplication>
+#include <QComboBox>
+#include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QDebug>
-#include <QApplication>
-#include <QtGui>
-#include <stdlib.h>
-char* device("unknown");
+#include <QProcess>
+#include <QProgressDialog>
+
+QString device("unknow");
 
 OTools::OTools(QWidget *parent) :
     QMainWindow(parent),
@@ -18,66 +21,6 @@ OTools::OTools(QWidget *parent) :
 OTools::~OTools()
 {
     delete ui;
-}
-
-void done(){
-}
-
-// Device Selection
-
-void OTools::on_bacon_clicked()
-{
-    ui->modbox->setEnabled(true);
-    ui->recbox->setEnabled(true);
-    ui->filebox->setEnabled(true);
-    ui->backbox->setEnabled(true);
-    ui->UnlockB->setEnabled(true);
-    ui->LockB->setEnabled(true);
-    ui->EfsB->setEnabled(true);
-    ui->label->setVisible(false);
-    device="bacon";
-    setenv("adbdevice", device, true);
-}
-
-void OTools::on_find7_clicked(){
-    ui->modbox->setEnabled(true);
-    ui->recbox->setEnabled(true);
-    ui->filebox->setEnabled(true);
-    ui->backbox->setEnabled(true);
-    ui->label->setVisible(false);
-    ui->UnlockB->setEnabled(false);
-    ui->LockB->setEnabled(false);
-    ui->EfsB->setEnabled(false);
-    device="find7";
-    setenv("adbdevice", device, true);
-}
-
-void OTools::on_find5_clicked()
-{
-    ui->modbox->setEnabled(true);
-    ui->recbox->setEnabled(true);
-    ui->filebox->setEnabled(true);
-    ui->backbox->setEnabled(true);
-    ui->label->setVisible(false);
-    ui->UnlockB->setEnabled(false);
-    ui->LockB->setEnabled(false);
-    ui->EfsB->setEnabled(false);
-    device="find5";
-    setenv("adbdevice", device, true);
-}
-
-void OTools::on_n1_clicked()
-{
-    ui->modbox->setEnabled(true);
-    ui->recbox->setEnabled(true);
-    ui->filebox->setEnabled(true);
-    ui->backbox->setEnabled(true);
-    ui->label->setVisible(false);
-    ui->UnlockB->setEnabled(false);
-    ui->LockB->setEnabled(false);
-    ui->EfsB->setEnabled(false);
-    device="n1";
-    setenv("adbdevice", device, true);
 }
 
 // ToolBar
@@ -94,13 +37,76 @@ void OTools::on_actionAbout_triggered()
 
 void OTools::on_actionUpdate_triggered()
 {
-    QMessageBox::information(this,tr("Update"),"Click Start to update OTools");
+    QMessageBox::information(this,tr("Update"),"Click Start to update OTools","OK");
+    /*TODO:
+     * download by using a json file or an xml from github?
+     */
 }
+
+void OTools::on_f5R_clicked()
+{
+    device="find5";
+    ui->modbox->setEnabled(true);
+    ui->recbox->setEnabled(true);
+    ui->filebox->setEnabled(true);
+    ui->backbox->setEnabled(true);
+    ui->label->setVisible(false);
+    ui->UnlockB->setEnabled(false);
+    ui->LockB->setEnabled(false);
+    ui->EfsB->setEnabled(false);
+    const char *fdevice = qPrintable(device);
+    setenv("adbdevice", fdevice, true);
+}
+
+void OTools::on_f7R_clicked()
+{
+    device="find7";
+    ui->modbox->setEnabled(true);
+    ui->recbox->setEnabled(true);
+    ui->filebox->setEnabled(true);
+    ui->backbox->setEnabled(true);
+    ui->label->setVisible(false);
+    ui->UnlockB->setEnabled(false);
+    ui->LockB->setEnabled(false);
+    ui->EfsB->setEnabled(false);
+    const char *fdevice = qPrintable(device);
+    setenv("adbdevice", fdevice, true);
+}
+
+void OTools::on_opoR_clicked()
+{
+    device="bacon";
+    ui->modbox->setEnabled(true);
+    ui->recbox->setEnabled(true);
+    ui->filebox->setEnabled(true);
+    ui->backbox->setEnabled(true);
+    ui->UnlockB->setEnabled(true);
+    ui->LockB->setEnabled(true);
+    ui->EfsB->setEnabled(true);
+    ui->label->setVisible(false);
+    const char *fdevice = qPrintable(device);
+    setenv("adbdevice", fdevice, true);
+}
+
+void OTools::on_n1R_clicked()
+{
+    device="n1";
+    ui->modbox->setEnabled(true);
+    ui->recbox->setEnabled(true);
+    ui->filebox->setEnabled(true);
+    ui->backbox->setEnabled(true);
+    ui->label->setVisible(false);
+    ui->UnlockB->setEnabled(false);
+    ui->LockB->setEnabled(false);
+    ui->EfsB->setEnabled(false);
+    const char *fdevice = qPrintable(device);
+    setenv("adbdevice", fdevice, true);
+}
+
 
 // Buttons
 
 /* TODO:
- * Dialog while executing system()
  * Check if system() returned 0
  */
 
@@ -109,48 +115,61 @@ void OTools::on_actionUpdate_triggered()
 
 void OTools::on_BackupB_clicked()
 {
-    QString backfile=QFileDialog::getSaveFileName(this, tr("Save file"), "", ".ab");
-    QMessageBox::information(this,tr("Backup"),backfile,"OK");
-    const char *backupf = qPrintable(backfile);
-    setenv("backupf", backupf, true);
-    system("adb backup -apk -nosystem -noshared f $backupf");
-    QMessageBox::information(this,tr("Backup"),"Done!","OK");
-    /* TODO:
-     * figure out why the file is not saved, the var is ok
-     */
+    QString backfile=QFileDialog::getSaveFileName(this, tr("Save file"), "", ".ab;;All Files (*.*)");
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Backup", backfile,
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        const char *backupf = qPrintable(backfile);
+        setenv("backupf", backupf, true);
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb backup -apk -nosystem -noshared f $backupf");
+        dialog->exec();
+        QMessageBox::information(this,tr("Backup"),"Done!","OK");
+    }
 }
 
 void OTools::on_RestoreB_clicked()
 {
-    QString backfile=QFileDialog::getOpenFileName(
-                this,
-                tr("Choose File"),
-                "~"
-                "Backups (*.ab);;All Files (*.*)"
-                );
-    QMessageBox::information(this,tr("Restore Backup"),backfile,"OK");
-    const char *backupf = qPrintable(backfile);
-    setenv("backupf", backupf, true);
-    system("adb restore $backupf");
-    QMessageBox::information(this,tr("Restore Backup"),"Done!","OK");
+    QString backfile=QFileDialog::getOpenFileName(this, tr("Choose File"),"~","Backups (*.ab);;All Files (*.*)");
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Restore Backup", backfile,
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        const char *backupf = qPrintable(backfile);
+        setenv("backupf", backupf, true);
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb restore $backupf");
+        dialog->exec();
+        QMessageBox::information(this,tr("Restore Backup"),"Done!","OK");
+    }
 }
 
 //Files
 
 void OTools::on_PushB_clicked(){
-    QString pushfile=QFileDialog::getOpenFileName(
-                this,
-                tr("Choose File"),
-                "~"
-                "All Files (*.*)"
-                );
+    QString pushfile=QFileDialog::getOpenFileName(this, tr("Choose File"), "~", "All Files (*.*)");
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Push File", pushfile,
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
       const char *file = qPrintable(pushfile);
       setenv("pushfile", file, true);
-      system("adb push $pushfile /sdcard/");
+      QProcess process;
+      QProgressDialog *dialog = new QProgressDialog;
+      dialog->setAttribute(Qt::WA_DeleteOnClose);
+      dialog->setRange(0,0);
+      connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+      process.start("adb push $pushfile /sdcard/");
+      dialog->exec();
       QMessageBox::information(this,tr("Push File"),"Done!","OK");
     }
 }
@@ -162,21 +181,147 @@ void OTools::on_PullB_clicked(){
 }
 
 void OTools::on_CamB_clicked(){
-    /* TODO:
-     * something similar to pull, but instead of selecting a file, make user select the destination folder for the photos
-     * On aosp roms the dcim path is /sdcard/DCIM/Camera
-     */
+    QString camdir=QFileDialog::getExistingDirectory(this,tr("Choose the destination folder"), "~");
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Import from camera", camdir,
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        const char *out = qPrintable(camdir);
+        setenv("camdir", out, true);
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb pull /sdcard/DCIM/Camera $camdir");
+        dialog->exec();
+        QMessageBox::information(this,tr("Import from camera"),"Done!","OK");
+    }
 }
 
 //Recovery
 
 void OTools::on_pushButton_3_clicked()
 {
-    /* TODO:
-     * if install zip is cheked enable the select button, export the path as bash var, add the flag to openrecovery script
-     * if wipe data is checked add a flag to openrecovery script
-     * if backup is checked add a flag to openrecovery script
-     */
+    if (ui->BackCheck->isChecked()){
+        if (ui->ZipCheck->isChecked()){
+            if (ui->WipeCheck->isChecked()){
+                //back + zip + wipe
+                QString pushfile=QFileDialog::getOpenFileName(this, tr("Choose File"), "~", "Flashable Files (*.zip);;All Files (*.*)");
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, "Flash Zip", pushfile,
+                                              QMessageBox::Yes|QMessageBox::No);
+                if (reply == QMessageBox::Yes) {
+                    QProcess process;
+                    QProgressDialog *dialog = new QProgressDialog;
+                    dialog->setAttribute(Qt::WA_DeleteOnClose);
+                    dialog->setRange(0,0);
+                    connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+                    process.start("sh res/openrecoveryscript --full");
+                    dialog->exec();
+                    QMessageBox::information(this,tr("Flasher"),"Done!","OK");
+                }
+        }
+        else {
+                //back +zip
+                QString pushfile=QFileDialog::getOpenFileName(this, tr("Choose File"), "~", "Flashable Files (*.zip);;All Files (*.*)");
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, "Flash Zip", pushfile,
+                                              QMessageBox::Yes|QMessageBox::No);
+                if (reply == QMessageBox::Yes) {
+                    QProcess process;
+                    QProgressDialog *dialog = new QProgressDialog;
+                    dialog->setAttribute(Qt::WA_DeleteOnClose);
+                    dialog->setRange(0,0);
+                    connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+                    process.start("sh res/openrecoveryscript --backup-zip");
+                    dialog->exec();
+                    QMessageBox::information(this,tr("Flasher"),"Done!","OK");
+                }
+            }
+        }
+        else{
+            if (ui->WipeCheck->isChecked()){
+                //backup + wipe
+                QProcess process;
+                QProgressDialog *dialog = new QProgressDialog;
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+                dialog->setRange(0,0);
+                connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+                process.start("sh res/openrecoveryscript --backup-data");
+                dialog->exec();
+                QMessageBox::information(this,tr("Flasher"),"Done!","OK");
+            }
+            else{
+                //backup
+                QProcess process;
+                QProgressDialog *dialog = new QProgressDialog;
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+                dialog->setRange(0,0);
+                connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+                process.start("sh res/openrecoveryscript --backup");
+                dialog->exec();
+                QMessageBox::information(this,tr("Flasher"),"Done!","OK");
+            }
+        }
+    }
+    else{
+        if (ui->ZipCheck->isChecked()){
+            if (ui->WipeCheck->isChecked()){
+                //zip + wipe
+                QString pushfile=QFileDialog::getOpenFileName(this, tr("Choose File"), "~", "Flashable Files (*.zip);;All Files (*.*)");
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, "Flash Zip", pushfile,
+                                              QMessageBox::Yes|QMessageBox::No);
+                if (reply == QMessageBox::Yes) {
+                    QProcess process;
+                    QProgressDialog *dialog = new QProgressDialog;
+                    dialog->setAttribute(Qt::WA_DeleteOnClose);
+                    dialog->setRange(0,0);
+                    connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+                    process.start("sh res/openrecoveryscript --data-zip");
+                    dialog->exec();
+                    QMessageBox::information(this,tr("Flasher"),"Done!","OK");
+                }
+            }
+            else {
+                //zip
+                QString pushfile=QFileDialog::getOpenFileName(this, tr("Choose File"), "~", "Flashable Files (*.zip);;All Files (*.*)");
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, "Flash zip", pushfile,
+                                              QMessageBox::Yes|QMessageBox::No);
+                if (reply == QMessageBox::Yes) {
+                    QProcess process;
+                    QProgressDialog *dialog = new QProgressDialog;
+                    dialog->setAttribute(Qt::WA_DeleteOnClose);
+                    dialog->setRange(0,0);
+                    connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+                    process.start("sh res/openrecoveryscript --sideload");
+                    dialog->exec();
+                    QMessageBox::information(this,tr("Flasher"),"Done!","OK");
+                }
+            }
+        }
+        else{
+            if (ui->WipeCheck->isChecked()){
+                //wipe
+                QProcess process;
+                QProgressDialog *dialog = new QProgressDialog;
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+                dialog->setRange(0,0);
+                connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+                process.start("sh res/openrecoveryscript --data");
+                dialog->exec();
+                QMessageBox::information(this,tr("Flasher"),"Done!","OK");
+            }
+    }
+    }
+        if (!ui->WipeCheck->isChecked())
+            ui->WipeCheck->setCheckState(Qt::Unchecked);
+        if (!ui->ZipCheck->isChecked())
+            ui->ZipCheck->setCheckState(Qt::Unchecked);
+        if (!ui->BackCheck->isChecked())
+            ui->BackCheck->setCheckState(Qt::Unchecked);
 }
 
 // Advanced stuffs
@@ -186,28 +331,33 @@ void OTools::on_pushButton_3_clicked()
 void OTools::on_UnlockB_clicked()
 {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Unlock Bootloader", "You want to unlock the bootloader,\nthis operation will erase all your personal content such as photos, apps and music, a backup is recommend!\nThis operation may brick your device if something goes wrong.\nAre you sure you want to unlock your device?",
+    reply = QMessageBox::warning(this, "Unlock Bootloader", "You want to unlock the bootloader,\nthis operation will erase all your personal content such as photos, apps and music, a backup is recommend!\nThis operation may brick your device if something goes wrong.\nAre you sure you want to unlock your device?",
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
-      system("adb wait-for-device");
-      system("adb reboot bootloader");
-      system("fastboot devices");
-      system("fastboot oem-unlock");
-      // Dunno how that lk manages fb commands,
-      QMessageBox::information(this,tr("Unlock Bootloader"),"Wait until the device completes the operation.","Done");
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb reboot bootloader && fastboot devices && fastboot oem unlock");
+        dialog->exec();
+        QMessageBox::information(this,tr("Unlock Bootloader"),"Wait until the device completes the operation.","Done");
     }
 }
 
 void OTools::on_LockB_clicked()
 {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Lock Bootloader", "You want to lock the bootloader, you won't be able to boot or flash img files until you'll re-unlock it! You won't loose any data.\n This operation may brick your device if something goes wrong.\nAre you sure you want to unlock your device?",
+    reply = QMessageBox::warning(this, "Lock Bootloader", "You want to lock the bootloader, you won't be able to boot or flash img files until you'll re-unlock it! You won't loose any data.\n This operation may brick your device if something goes wrong.\nAre you sure you want to unlock your device?",
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
-      system("adb wait-for-device");
-      system("adb reboot bootloader");
-      system("fastboot devices");
-      system("fastboot oem-lock");
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb reboot bootloader && fastboot devices && fastboot oem lock");
+        dialog->exec();
       QMessageBox::information(this,tr("Lock Bootloader"),"Done!","OK");
     }
 }
@@ -227,10 +377,13 @@ void OTools::on_FBootB_clicked()
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         setenv("ffbboot", ffbboot, true);
-        system("adb wait-for-device");
-        system("adb reboot bootloader");
-        system("fastboot devices");
-        system("fastboot boot $ffbboot");
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb reboot bootloader && fastboot devices && fastboot boot $ffbboot");
+        dialog->exec();
         QMessageBox::information(this,tr("Fastboot Boot"),"Done!","OK");
     }
 }
@@ -250,11 +403,13 @@ void OTools::on_FlashBootB_clicked()
     if (reply == QMessageBox::Yes) {
         const char *ffboot = qPrintable(fboot);
         setenv("ffboot", ffboot, true);
-        system("adb wait-for-device");
-        system("adb reboot bootloader");
-        system("fastboot devices");
-        system("fastboot flash boot $ffboot");
-        system("fastboot reboot");
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb reboot bootloader && fastboot devices && fastboot flash boot $ffboot");
+        dialog->exec();
         QMessageBox::information(this,tr("Kernel Installer"),"Done!","OK");
     }
 }
@@ -274,22 +429,18 @@ void OTools::on_RecoveryB_clicked()
         QMessageBox::information(this,tr("Recovery Installer"),recovery,"OK");
         const char *frecovery = qPrintable(recovery);
         setenv("frecovery", frecovery, true);
-        system("adb wait-for-device");
-        system("adb reboot bootloader");
-        system("fastboot devices");
-        system("fastboot flash recovery $frecovery");
-        system("fastboot reboot");
-        QMessageBox::information(this,tr("Recovery Installer"),"Done!","OK");
     } else {
         char* recovery("res/$adbdevice/recovery.img");
         setenv("frecovery", recovery, true);
-        system("adb wait-for-device");
-        system("adb reboot bootloader");
-        system("fastboot devices");
-        system("fastboot flash recovery $ffboot");
-        system("fastboot reboot");
-        QMessageBox::information(this,tr("Recovery Installer"),"Done!","OK");
     }
+    QProcess process;
+    QProgressDialog *dialog = new QProgressDialog;
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->setRange(0,0);
+    connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+    process.start("adb reboot bootloader && fastboot devices && fastboot flash recovery $recovery && fastboot reboot");
+    dialog->exec();
+    QMessageBox::information(this,tr("Recovery Installer"),"Done!","OK");
 }
 
 void OTools::on_FBFlashB_clicked()
@@ -304,18 +455,20 @@ void OTools::on_FBFlashB_clicked()
 void OTools::on_RootB_clicked()
 {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Rooter", "This operation will root your device.\nBootloader must be unlocked otherwhise it fail.\nDo you want to continue?",
+    reply = QMessageBox::warning(this, "Rooter", "This operation will root your device.\nBootloader must be unlocked otherwhise it fail.\nDo you want to continue?",
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         //TODO: add a unlocked-checker using fastboot oem device-info | grep 'Device unlocked: '
         const char *updatezip("res/root.zip");
         setenv("updatezip", updatezip, true);
-        system("adb wait-for-device");
-        system("adb reboot bootloader");
-        system("fastboot device");
-        system("fastboot boot res/$adbdevice/recovery.img");
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb reboot bootloader && fastboot devices && fastboot boot res/$adbdevice/recovery.img && sh res/openrecovery.sh");
+        dialog->exec();
         // TODO: find a better way to inject openrecovery commands
-        system("sh res/openrecovery.sh --sideload");
         QMessageBox::information(this,tr("Rooter"),"Done!","OK");
     }
 }
@@ -335,11 +488,13 @@ void OTools::on_LogoB_clicked()
     if (reply == QMessageBox::Yes) {
         const char *flogo = qPrintable(logo);
         setenv("flogo", flogo, true);
-        system("adb wait-for-device");
-        system("adb reboot bootloader");
-        system("fastboot devices");
-        system("fastboot flash LOGO $flogo");
-        system("fastboot reboot");
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb reboot bootloader && fastboot devices && fastboot flash LOGO $flogo && fastboot reboot");
+        dialog->exec();
         QMessageBox::information(this,tr("Logo Changer"),"Done!","OK");
     }
 }
@@ -351,10 +506,14 @@ void OTools::on_EfsB_clicked()
     reply = QMessageBox::question(this, "EFS Backup", "This operation will backup efs on the top of your sdcard.\nYou need root access otherwhise it will fail\nDo you want to continue?",
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
-      system("adb wait-for-device");
-      system("adb shell 'dd if=/dev/block/mmcblk0p10 of=/sdcard/modemst1.bin bs=512'");
-      system("adb shell 'dd if=/dev/block/mmcblk0p11 of=/sdcard/modemst2.bin bs=512'");
-          QMessageBox::information(this,tr("EFS Backup"),"Done!","OK");
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb root && adb shell 'dd if=/dev/block/mmcblk0p10 of=/sdcard/modemst1.bin bs=512' && adb shell 'dd if=/dev/block/mmcblk0p11 of=/sdcard/modemst2.bin bs=512'");
+        dialog->exec();
+      QMessageBox::information(this,tr("EFS Backup"),"Done!","OK");
     }
 }
 
@@ -365,16 +524,13 @@ void OTools::on_SRECB_clicked()
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         QMessageBox::information(this,tr("Screen Recorder"), "UnPlug the device when you want to stop the registration.\nAll the other features will be disabled!");
-        //freeze the program and update the suggestion text
-        ui->backbox->setEnabled(false);
-        ui->modbox->setEnabled(false);
-        ui->recbox->setEnabled(false);
-        ui->filebox->setEnabled(false);
-        system("adb shell screenrecord /sdcard/video.mp4");
-        ui->modbox->setEnabled(true);
-        ui->recbox->setEnabled(true);
-        ui->filebox->setEnabled(true);
-        ui->backbox->setEnabled(true);
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb shell screenrecord /sdcard/video.mp4");
+        dialog->exec();
         QMessageBox::information(this,tr("Screen Recorder"),"Done!","OK");
     }
 }
@@ -398,12 +554,20 @@ void OTools::on_ApkB_clicked()
     reply = QMessageBox::question(this, "Apk Installer",apk ,
                                   QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
-
         const char *fapk = qPrintable(apk);
         setenv("fapk", fapk, true);
-        system("adb wait-for-device");
-        system("adb install $fapk");
+        QProcess process;
+        QProgressDialog *dialog = new QProgressDialog;
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setRange(0,0);
+        connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+        process.start("adb install $fapk");
+        dialog->exec();
         QMessageBox::information(this,tr("Apk Installer"),"Done!","OK");
-      QApplication::quit();
     }
+}
+
+void OTools::on_RootC_clicked()
+{
+    system("xterm -e 'sudo ./O-Tools &>/dev/null'");
 }

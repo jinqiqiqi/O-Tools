@@ -76,6 +76,18 @@ private slots:
 
     void on_ApkB_clicked();
 
+    void on_StartB_clicked();
+
+    void on_n1R_clicked();
+
+    void on_f5R_clicked();
+
+    void on_f7R_clicked();
+
+    void on_opoR_clicked();
+
+    void on_RootC_clicked();
+
 private:
     Ui::OTools *ui;
 };
