@@ -183,7 +183,6 @@ function fbboot () {
 
 function back1 () {
   headerprint
-  echo "|-----------------------------------------------|"
   echo "| $(tput setaf 3)1-Backup                   2-Restore$(tput sgr 0)          |"
   echo "|                                               |"
   echo "| 0- Back                                       |"
@@ -224,7 +223,6 @@ function restore () {
 
 function pnp () {
   headerprint
-  echo "|-----------------------------------------------|"
   echo "| $(tput setaf 3)1-Push a file            2- Import Camera$(tput sgr 0)     |"
   echo "|                                               |"
   echo "| 0- Back                                       |"
@@ -309,7 +307,6 @@ function bhistorian () {
 
 function wipec () {
   headerprint
-  echo "|-----------------------------------------------|"
   echo "| $(tput setaf 3)1- Wipe Cache + Dalvik   2-Wipe Data$(tput sgr 0)                |"
   echo "|                                               |"
   echo "| 0- Back                                       |"
@@ -366,8 +363,7 @@ function deviceinfo () {
   echo "| Kernel: Linux $(adb shell uname -r)"
   echo "| Status: $STATUS"
   echo "| Location: $USBADB"
-  echo "|-----------------------------------------------|"
-  echo "| $(tput setaf 3)1- Export as Text                       $(tput sgr 0)            |"
+  echo "| $(tput setaf 3)1- Export as Text      $(tput sgr 0)            |"
   echo "|                                               |"
   echo "| 0- Back                                       |"
   echo "|-----------------------------------------------|"
@@ -523,12 +519,14 @@ function settings () {
   1) drivers;;
   2) ota;;
   0) home;;
-  *)echo "$(tput setaf 1)Wrong input, retry!$(tput sgr 0)" && sleep 2 && settings;;
+  #it's an alpha, let's add a bug
+  *) echo "$(tput setaf 1)Wrong input, retry!$(tput sgr 0)" && sleep 2;;
   esac
 }
 
 function ota () {
   headerprint
+  #it's an alpha, let user download source code instead of release zip
   echo "Downloading lastest OTool release from Git, it may take up to 30 mins..."
   wget https://github.com/linuxxxxx/OTools/archive/unix.zip  &> /dev/null
   rm -rf ota && mkdir ota
