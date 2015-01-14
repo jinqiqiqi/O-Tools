@@ -26,7 +26,7 @@ function headerprint () {
   fi
   clear
   echo "|-----------------------------------------------|"
-  echo "| XiaomiTool"
+  echo "| OTool"
   echo "| Running on $OS"
   echo "|"
   echo "| Device:   $DID"
@@ -46,7 +46,7 @@ function home () {
   echo "| $(tput setaf 4)24- Boot                25- Wipe$(tput sgr 0)              |"
   if [ $(adb shell getprop ro.build.version.sdk) == "19" ]; then
     echo "| $(tput setaf 4)30- Switch to Dalvik    31- Switch to ART$(tput sgr 0)     |"
-  elif [ [ $(adb shell getprop ro.build.version.sdk) > "18" ]; then
+  elif [ $(adb shell getprop ro.build.version.sdk) > "18" ]; then
     echo "| $(tput setaf 4)32- Record the screen$(tput sgr 0)                         |"
   fi
   echo "| $(tput setaf 4)99- Device Info         999- Manage$(tput sgr 0)           |"
@@ -73,7 +73,7 @@ function home () {
     999) settings;;
     0) quit;;
     00) about;;
-    make me a sandwich) read -p "Do it yourself: " CHOICE; if [ "$CHOICE" = "sudo make me a sandwich" ]; then; echo -e "{orange}Advanced mode enabled!$(tput sgr 0)" && ISCRAZY=1 && sleep 3 && home; else; echo -e "$(tput setaf 1)Wrong input!$(tput sgr 0)"; sleep 3 && home; fi;
+    make\ me\ a\ sandwich) echo -e "{orange}Advanced mode enabled!$(tput sgr 0)" && ISCRAZY=1 && sleep 3 && home;;
     *) echo -e "$(tput setaf 1)Wrong input$(tput sgr 0)"; sleep 2; home;;
     esac
 }
@@ -86,12 +86,7 @@ function apk () {
   echo " "
   read -p "Drag your apk here and press ENTER: " APK
   adb install $APK
-  if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 function recovery () {
@@ -102,12 +97,7 @@ function recovery () {
   wait_for_fastboot
   fastboot flash $DDIR/recovery.img
   fastboot reboot
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 function rom () {
@@ -127,12 +117,7 @@ function rom () {
   echo "Warning: if your device bootloops, boot into recovery and wipe data!$(tput sgr 0)"
   read -p "If your phone screen is blank with recovery background, press enter or wait (it may reboot automatically, depends on the rom you flashed)"
   adb reboot
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-
+   read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
   }
 
 function zip () {
@@ -151,12 +136,7 @@ function zip () {
   echo "Now wait until your phone install zip file.."
   read -p "Only when your phone screen is blank with recovery background, press enter"
   adb reboot
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 root () {
@@ -172,12 +152,7 @@ root () {
   adb wait-for-device
   adb sideload $ROOTZIP
   echo "Now wait until your phone install zip file. It will reboot automatically one it's done."
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
 }
 
 # <- Advanced ->
@@ -189,12 +164,7 @@ shelll () {
   echo "Type exit when you want to quit"
   echo " "
   adb shell
-  if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 function fbboot () {
@@ -206,12 +176,7 @@ function fbboot () {
   adb reboot bootloader
   wait_for_fastboot
   fastboot boot $BOOTIMG
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 # <- Backup ->
@@ -224,16 +189,12 @@ function back1 () {
   echo "| 0- Back                                       |"
   echo "|-----------------------------------------------|"
   read -p "?" CHOICE
-    if [ "$CHOICE" = "1" ]; then
-        backup
-    elif [ "$CHOICE" = "2" ]; then
-        restore
-    elif [ "$CHOICE" = "0" ]; then
-        home
-    else
-    echo "$(tput setaf 1)Wrong input$(tput sgr 0)"
-    back1
-    fi
+  case "$CHOICE" in
+  1) backup;;
+  2) restore;;
+  0) home;;
+  *) echo "$(tput setaf 1)Wrong input$(tput sgr 0)" && sleep 2 && back1;;
+  esac
   }
 
 function backup () {
@@ -245,12 +206,7 @@ function backup () {
   echo "Android 4.4.x KitKat has a bug with adb backup, if you're running it backup may fail!$(tput sgr 0)"
   echo "Enter password on your phone and let it work"
   adb backup -nosystem -noshared -apk -f $BACKFOLDER/$BACKUPID.ab
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 function restore () {
@@ -261,12 +217,7 @@ function restore () {
   echo " "
   echo "On your phone, type password and let it works"
   adb restore $BACKFOLDER/$BACKUPID.ab
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 # <- Sync ->
@@ -279,17 +230,12 @@ function pnp () {
   echo "| 0- Back                                       |"
   echo "|-----------------------------------------------|"
   read -p "?" CHOICE
-    if [ "$CHOICE" = "1" ]; then
-        push
-    elif [ "$CHOICE" = "2" ]; then
-        camera
-    elif [ "$CHOICE" = "0" ]; then
-        home
-    else
-    echo "$(tput setaf 1)Wrong input$(tput sgr 0)"
-    sleep 2
-    pnp
-    fi
+  case "$CHOICE" in
+  1) push;;
+  2) camera;;
+  0) home;;
+  *) echo "$(tput setaf 1)Wrong input$(tput sgr 0)" && sleep 2 && pnp;;
+  esac
   }
 
 function push () {
@@ -298,12 +244,7 @@ function push () {
   echo " "
   read -p "Drag your file here (one): " FILE
   adb push $FILE /sdcard
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 function camera () {
@@ -312,12 +253,7 @@ function camera () {
   echo " "
   read -p "Press enter to start"
   adb pull $CAMDIR Camera
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 # <- 4.4 Features ->
@@ -330,12 +266,7 @@ function beart () {
   adb shell rm -rf /data/dalvik-cache
   adb shell 'echo -n libart.so > /data/property/persist.sys.dalvik.vm.lib'
   adb reboot
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
 }
 
 function bedalvik () {
@@ -346,12 +277,7 @@ function bedalvik () {
   adb shell rm -rf /data/dalvik-cache
   adb shell 'echo -n libdalvik.so > /data/property/persist.sys.dalvik.vm.lib'
   adb reboot
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 # < 4.4+ Features ->
@@ -364,12 +290,7 @@ function srec () {
   NAME=$(date "+%N")
   adb shell screenrecord /sdcard/Movies/$NAME.mp4
   echo "Done! You'll find the file on your phone"
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
   }
 
 # < 5+ Features ->
@@ -381,12 +302,7 @@ function bhistorian () {
   read -p "Press enter to dump the battery stats"
   adb shell dumpsys batterystats 2>&1 | tee res/bhistorian/$NOW &> /dev/null
   python res/bhistorian/historian.py res/bhistorian/$NOW &> /dev/null
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
-  home
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"  home
 }
 
 # <- Wipes ->
@@ -398,18 +314,12 @@ function wipec () {
   echo "|                                               |"
   echo "| 0- Back                                       |"
   echo "|-----------------------------------------------|"
-  read -p "? " CHOICE
-  if [ "$CHOICE" == 1 ]; then
-    wipecache
-  elif [ "$CHOICE" == 2 ]; then
-    wipedata
-  elif [ "$CHOICE" == 0 ]; then
-    home
-  else
-    echo "$(tput setaf 1)Wrong input, retry!$(tput sgr 0)"
-    sleep 2
-    wipec
-  fi
+    case "$CHOICE" in
+  1) wipecache;;
+  2) $CHOICE;;
+  0) home;;
+  *) echo "$(tput setaf 1)Wrong input$(tput sgr 0)" && sleep 2 && wipec;;
+  esac
 }
 
 function wipecache () {
@@ -423,11 +333,7 @@ function wipecache () {
   adb reboot recovery
   adb sideload "res/cache.zip"
   echo "Wait until it works..."
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
   home
 }
 
@@ -442,11 +348,7 @@ function wipedata () {
   adb reboot recovery
   echo "The device will wipe data automatically, it may reboot at the end,"
   echo "if it stucks on a blank screen, reboot it by pressing power button."
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
   home
 }
 
@@ -465,23 +367,17 @@ function deviceinfo () {
   echo "| Status: $STATUS"
   echo "| Location: $USBADB"
   echo "|-----------------------------------------------|"
-  echo "| $(tput setaf 3)1- Export as Text        2-Check if fake$(tput sgr 0)            |"
+  echo "| $(tput setaf 3)1- Export as Text                       $(tput sgr 0)            |"
   echo "|                                               |"
   echo "| 0- Back                                       |"
   echo "|-----------------------------------------------|"
   read -p "? " CHOICE
-  if [ "$CHOICE" == 1 ]; then
-    exportinfo
-  elif [ "$CHOICE" == 2 ]; then
-    fakeif
-  elif [ "$CHOICE" == 0 ]; then
-    home
-  else
-    echo "$(tput setaf 1)Wrong input, retry!$(tput sgr 0)"
-    sleep 2
-    wipec
-  fi
-}
+  case "$CHOICE" in
+  1) exportinfo;;
+  0) home;;
+  *) echo "$(tput setaf 1)Wrong input, retry!$(tput sgr 0)" && sleep 2 && deviceinfo;;
+  esac
+  }
 
 function exportinfo () {
   touch deviceinfo.txt
@@ -501,22 +397,18 @@ function exportinfo () {
   echo -e 'Status: $STATUS' >> deviceinfo.txt
   echo -e 'Location: $USBADB' >> deviceinfo.txt
   echo "$(tput setaf 2)Everything have been exported to deviceinfo.txt"
-    if [ $? -eq 0 ];
-    read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
-  else
-    read -p "$(tput setaf 1)Something went wrong! Press Enter to quit.$(tput sgr 0)"
-  fi
+  read -p "$(tput setaf 2)Done! Press Enter to quit.$(tput sgr 0)"
   home
 }
 
-function wait_for_any_adb() {
+wait_for_any_adb() {
   if [[ $DISTRO == "ubuntu" ]]; then
     echo "$(tput setaf 3)Waiting for adb device$(tput sgr 0)"
-    ADB_STATE=$(adb devices | grep $DEVICE_ID |grep 'device\|recovery')
+    ADB_STATE=$(adb devices | grep 'device\|recovery')
     while [[ -z "$ADB_STATE" ]]
     do
         sleep 1
-        ADB_STATE=$(adb devices | grep $DEVICE_ID |grep 'device\|recovery')
+        ADB_STATE=$(adb devices | grep 'device\|recovery')
     done
   else
     echo "$(tput setaf 3)Waiting for device to be connected in normal or recovery mode$(tput sgr 0)"
@@ -524,7 +416,7 @@ function wait_for_any_adb() {
   fi
 }
 
-function wait_for_adb() {
+wait_for_adb() {
   MODE=$1
   if [[ $DISTRO == "other" ]]; then
     echo "$(tput setaf 3)Waiting for adb $MODE to be ready$(tput sgr 0)"
@@ -540,7 +432,7 @@ function wait_for_adb() {
   fi
 }
 
-function wait_for_adb_disconnect() {
+wait_for_adb_disconnect() {
   if [[ $DISTRO == "other" ]]; then
     sleep 5
   else
@@ -554,15 +446,16 @@ function wait_for_adb_disconnect() {
   fi
 }
 
-function wait_for_fastboot() {
+wait_for_fastboot() {
     echo "$(tput setaf 3) Waiting for fastboot device$(tput sgr 0)"
-    FASTBOOT_STATE=$(fastboot devices | grep $DEVICE_ID | awk '{ print $1}' )
+    FASTBOOT_STATE=$(fastboot devices | awk '{ print $1}' )
     while ! [[ "$FASTBOOT_STATE" == *$DEVICE_ID* ]]
     do
         sleep 1
-        FASTBOOT_STATE=$(fastboot devices | grep $DEVICE_ID | awk '{ print $1}' )
+        FASTBOOT_STATE=$(fastboot devices | awk '{ print $1}' )
     done
 }
+
 
 function detect_device() {
     clear
@@ -583,13 +476,10 @@ function detect_device() {
 }
 
 function setup (){
-  if [ "$(uname) &> /dev/null" == "Darwin" ]; then
-    OS="Os X"
-    DISTRO="other"
-  fi
-  case "$expr substr $(uname -s) 1 5)"
-  Linux) OS="Linux" && python -mplatform | grep buntu && DISTRO="ubuntu" || DISTRO="other";;
-  MINHW32_NT) OS="Windows/CYGWIN" && DISTRO="other";;
+  case "$(uname)" in
+  Linux) OS="Linux" && python -mplatform | grep buntu && DISTRO="ubuntu" || DISTRO="other" ;;
+  MINGW32_NT) OS="Windows/CYGWIN" && DISTRO="other";;
+  Darwin) OS="Os X" && DISTRO="other";;
   esac
   RES=res
   ROOTZIP=$RES/root.zip
@@ -601,6 +491,7 @@ function setup (){
   NOW=$(date +"%F-%I-%H-%N")
   STATUS=$(adb get-state)
   SERIAL=$(adb get-serialno)
+  DEVICE_ID=$SERIAL
   USBADB=$(adb get-devpath)
   TOOLPATH=$(realpath .)
   }
@@ -645,7 +536,7 @@ function ota () {
   mv unix.zip ota/$filename.zip
   unzip ota/$filename.zip
   local TOPDIR=.
-  mv XiaomiTool-unix ../OTool-ota
+  mv OTool-unix ../OTool-ota
   local NEWTOOL=$(realpath ../OTool-ota)
   cp $BACKFOLDER ../OTool-ota/Backups &> /dev/null
   cp Camera ../OTool-ota/Camera &> /dev/null
@@ -659,7 +550,7 @@ function ota () {
 function disclaimer () {
   clear
   echo "$(tput setaf 1) ##########################################"
-  echo " # XiaomiTool ~~ Disclaimer               #"
+  echo " #   OTool    ~~   Disclaimer             #"
   echo " #                                        #"
   echo " # This program can brick your device,    #"
   echo " # kill your computer,                    #"
@@ -698,6 +589,7 @@ function quit () {
 
 # <- Start ->
   disclaimer
+  setup
   detect_device
   android_api
   home
