@@ -589,7 +589,6 @@ function quit () {
 
 # <- Start ->
   disclaimer
-  setup
   detect_device
-  android_api
+  setup
   home
