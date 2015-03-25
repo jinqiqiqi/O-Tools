@@ -453,6 +453,103 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:600; color:#ff0000;&quot;&gt;Select a device!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
+   <widget class="QGroupBox" name="partitionbox">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>160</y>
+      <width>221</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Partition Manager</string>
+    </property>
+    <widget class="QWidget" name="layoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>30</y>
+       <width>217</width>
+       <height>124</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_12">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QCheckBox" name="IncreaseSystemPartion">
+          <property name="text">
+           <string>Grow Data Partition</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Partition Size(UserData / SDCard):</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="UserDataPartitionCmbBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="currentText">
+         <string>06 GB {6.0 GiB / 21.3 GiB}</string>
+        </property>
+        <property name="maxVisibleItems">
+         <number>5</number>
+        </property>
+        <property name="insertPolicy">
+         <enum>QComboBox::NoInsert</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>06 GB {6.0 GiB / 21.3 GiB}</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>07 GB {7.0 GiB / 20.3 GiB}</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>08 GB {8.0 GiB / 19.3 GiB}</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>09 GB {9.0 GiB / 18.3 GiB}</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>10 GB {10.0 GiB / 17.3 GiB}</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnGrowParitionExecute">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Execute! (NO TURNING BACK)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -460,7 +557,7 @@
      <x>0</x>
      <y>0</y>
      <width>789</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -492,4 +589,7 @@
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>
