@@ -690,9 +690,9 @@ void OTools::postPartitionProcessing() {
 
     /* Now restore /persist partition */
     system("adb push find5/mmcblk0p21_persist_ext4.img /sdcard/");
-    system("adb push find5/twrp-2.8.5.0-find5.img /sdcard/");
+    system("adb push find5/recovery.img /sdcard/");
     system("adb shell \"dd if=/sdcard/mmcblk0p21_persist_ext4.img of=/dev/block/mmcblk0p21;"
-                       "dd if=/sdcard/twrp-2.8.5.0-find5.img of=/dev/block/mmcblk0p24; \"");
+                       "dd if=/sdcard/recovery.img of=/dev/block/mmcblk0p24; \"");
 }
 
 /* We do it on the main UI Thread since this is a non-cancellable operation
