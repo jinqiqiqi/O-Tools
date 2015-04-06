@@ -158,7 +158,11 @@ void OTools::on_BackupB_clicked()
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->setRange(0,0);
         connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+#ifdef __WIN32__
+        process.start("adb backup -apk -nosystem -noshared f " + env.value("backupf"));
+#else
         process.start("adb backup -apk -nosystem -noshared f $backupf");
+#endif
         dialog->exec();
         QMessageBox::information(this,tr("Backup"),"Done!","OK");
     }
@@ -182,7 +186,11 @@ void OTools::on_RestoreB_clicked()
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->setRange(0,0);
         connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+#ifdef __WIN32__
+        process.start("adb restore " + env.value("backupf"));
+#else
         process.start("adb restore $backupf");
+#endif
         dialog->exec();
         QMessageBox::information(this,tr("Restore Backup"),"Done!","OK");
     }
@@ -207,7 +215,11 @@ void OTools::on_PushB_clicked(){
       dialog->setAttribute(Qt::WA_DeleteOnClose);
       dialog->setRange(0,0);
       connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
-      process.start("adb push $pushfile /sdcard/");
+#ifdef __WIN32__
+        process.start("adb push " + env.value("pushfile") + " /sdcard/" );
+#else
+        process.start("adb push $pushfile /sdcard/");
+#endif
       dialog->exec();
       QMessageBox::information(this,tr("Push File"),"Done!","OK");
     }
@@ -236,7 +248,11 @@ void OTools::on_CamB_clicked(){
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->setRange(0,0);
         connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+#ifdef __WIN32__
+        process.start("adb pull /sdcard/DCIM/Camera " + env.value("camdir"));
+#else
         process.start("adb pull /sdcard/DCIM/Camera $camdir");
+#endif
         dialog->exec();
         QMessageBox::information(this,tr("Import from camera"),"Done!","OK");
     }
@@ -429,7 +445,11 @@ void OTools::on_FBootB_clicked()
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->setRange(0,0);
         connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+#ifdef __WIN32__
+        process.start("adb reboot bootloader && fastboot devices && fastboot boot " + env.value("ffbboot"));
+#else
         process.start("adb reboot bootloader && fastboot devices && fastboot boot $ffbboot");
+#endif
         dialog->exec();
         QMessageBox::information(this,tr("Fastboot Boot"),"Done!","OK");
     }
@@ -459,7 +479,11 @@ void OTools::on_FlashBootB_clicked()
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->setRange(0,0);
         connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+#ifdef __WIN32__
+        process.start("adb reboot bootloader && fastboot devices && fastboot flash boot " + env.value("ffboot"));
+#else
         process.start("adb reboot bootloader && fastboot devices && fastboot flash boot $ffboot");
+#endif
         dialog->exec();
         QMessageBox::information(this,tr("Kernel Installer"),"Done!","OK");
     }
@@ -529,7 +553,11 @@ void OTools::on_RootB_clicked()
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->setRange(0,0);
         connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+#ifdef __WIN32__
+        process.start("adb reboot bootloader && fastboot devices && fastboot boot res/" + env.value("adbdevice") + "/recovery.img && sh res/openrecovery.sh");
+#else
         process.start("adb reboot bootloader && fastboot devices && fastboot boot res/$adbdevice/recovery.img && sh res/openrecovery.sh");
+#endif
         dialog->exec();
         // TODO: find a better way to inject openrecovery commands
         QMessageBox::information(this,tr("Rooter"),"Done!","OK");
@@ -560,7 +588,11 @@ void OTools::on_LogoB_clicked()
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->setRange(0,0);
         connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+#ifdef __WIN32__
+        process.start("adb reboot bootloader && fastboot devices && fastboot flash LOGO " + env.value("flogo") + " && fastboot reboot");
+#else
         process.start("adb reboot bootloader && fastboot devices && fastboot flash LOGO $flogo && fastboot reboot");
+#endif
         dialog->exec();
         QMessageBox::information(this,tr("Logo Changer"),"Done!","OK");
     }
@@ -632,7 +664,11 @@ void OTools::on_ApkB_clicked()
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->setRange(0,0);
         connect(&process, SIGNAL(finished(int)), dialog, SLOT(close()));
+#ifdef __WIN32__
+        process.start("adb install " + env.value("fapk"));
+#else
         process.start("adb install $fapk");
+#endif
         dialog->exec();
         QMessageBox::information(this,tr("Apk Installer"),"Done!","OK");
     }
