@@ -923,7 +923,43 @@ Code:
                                "parted -s /dev/block/mmcblk0 name 29 sdcard \"");
             break;
         }
-
+    default: {
+/*
+02 GB (default Find 5 [X909] 16/32 GB) {2.0 GiB / 25.3 GiB}
+Code:
+20      2588672s  6782975s   4194304s   ext4         userdata
+21      6782976s  6799359s   16384s     ext4         persist
+22      6799360s  7847935s   1048576s   ext4         cache
+23      7847936s  7849983s   2048s                   misc
+24      7864320s  7884799s   20480s                  recovery
+25      7897088s  7962623s   65536s                  reserve1
+26      7962624s  7979007s   16384s                  reserve2
+27      7979008s  7995391s   16384s                  reserve3
+28      7995392s  8060927s   65536s                  reserve4
+29      8060928s  61071326s  53010399s  fat32        sdcard
+*/
+        system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 6782975s;"
+                           "parted -s /dev/block/mmcblk0 name 20 userdata;"
+                           "parted -s /dev/block/mmcblk0 mkpart primary 6782976s 6799359s;"
+                           "parted -s /dev/block/mmcblk0 name 21 persist;"
+                           "parted -s /dev/block/mmcblk0 mkpart primary 6799360s 7847935s;"
+                           "parted -s /dev/block/mmcblk0 name 22 cache \"");
+        system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 7847936s 7849983s;"
+                           "parted -s /dev/block/mmcblk0 name 23 misc;"
+                           "parted -s /dev/block/mmcblk0 mkpart primary 7864320s 7884799s;"
+                           "parted -s /dev/block/mmcblk0 name 24 recovery;"
+                           "parted -s /dev/block/mmcblk0 mkpart primary 7897088s 7962623s;"
+                           "parted -s /dev/block/mmcblk0 name 25 reserve1 \"");
+        system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 7962624s 7979007s;"
+                           "parted -s /dev/block/mmcblk0 name 26 reserve2;"
+                           "parted -s /dev/block/mmcblk0 mkpart primary 7979008s 7995391s;"
+                           "parted -s /dev/block/mmcblk0 name 27 reserve3;"
+                           "parted -s /dev/block/mmcblk0 mkpart primary 7995392s 8060927s;"
+                           "parted -s /dev/block/mmcblk0 name 28 reserve4;"
+                           "parted -s /dev/block/mmcblk0 mkpart primary 8060928s 100%;"
+                           "parted -s /dev/block/mmcblk0 name 29 sdcard \"");
+        break;
+        }
     }
     postPartitionProcessing();
     QMessageBox::information(this,tr("Partition Updater"),"Brave Soul! All should be done, if not RTFM :P","OK");

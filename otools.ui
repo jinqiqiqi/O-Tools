@@ -501,11 +501,11 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="currentText">
-         <string>06 GB {6.0 GiB / 21.3 GiB}</string>
+        <property name="currentIndex">
+         <number>5</number>
         </property>
         <property name="maxVisibleItems">
-         <number>5</number>
+         <number>7</number>
         </property>
         <property name="insertPolicy">
          <enum>QComboBox::NoInsert</enum>
@@ -533,6 +533,11 @@
         <item>
          <property name="text">
           <string>10 GB {10.0 GiB / 17.3 GiB}</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>DEFAULT: 02 GB (default Find 5 [X909] 16/32 GB) {2.0 GiB / 25.3 GiB}</string>
          </property>
         </item>
        </widget>
@@ -589,7 +594,4 @@
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="buttonGroup"/>
- </buttongroups>
 </ui>
