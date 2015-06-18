@@ -676,7 +676,7 @@ void OTools::on_ApkB_clicked()
 
 void OTools::on_RootC_clicked()
 {
-    system("xterm -e 'sudo ./O-Tools &>/dev/null'");
+    (void)system("xterm -e 'sudo ./O-Tools &>/dev/null'");
 }
 
 void OTools::on_IncreaseSystemPartion_toggled(bool checked)
@@ -692,20 +692,20 @@ void OTools::on_IncreaseSystemPartion_toggled(bool checked)
 
 void OTools::prepareDevice4PartitionUpdate() {
     /* Reboot into recovery and wait for adb to get recognized */
-    system("adb reboot recovery");
+    (void)system("adb reboot recovery");
     QMessageBox::information(this, tr("Waiting for Recovery boot..."), "Click PROCEED when the phone has booted into TWRP recovery properly. NOT BEFORE THAT...", "PROCEED");
 
     /* Assume parted, make2fs and tune2fs are present in /sbin
        thorough TWRP recovery. Unmount all mounted partitions
        in recovery */
-    system("adb shell \"umount /sdcard; umount /emmc; umount /data; umount /dev/block/mmcblk0p29; umount /dev/block/mmcblk0p22;\"");
+    (void)system("adb shell \"umount /sdcard; umount /emmc; umount /data; umount /dev/block/mmcblk0p29; umount /dev/block/mmcblk0p22;\"");
 
     /* Now we run parted with -s and pray it works ! */
-    system("adb shell \"parted -s /dev/block/mmcblk0 rm 30; parted -s /dev/block/mmcblk0 rm 29;"
+    (void)system("adb shell \"parted -s /dev/block/mmcblk0 rm 30; parted -s /dev/block/mmcblk0 rm 29;"
                        "parted -s /dev/block/mmcblk0 rm 28; parted -s /dev/block/mmcblk0 rm 27 \"");
-    system("adb shell \"parted -s /dev/block/mmcblk0 rm 26; parted -s /dev/block/mmcblk0 rm 25;"
+    (void)system("adb shell \"parted -s /dev/block/mmcblk0 rm 26; parted -s /dev/block/mmcblk0 rm 25;"
                        "parted -s /dev/block/mmcblk0 rm 24; parted -s /dev/block/mmcblk0 rm 23 \"");
-    system("adb shell \"parted -s /dev/block/mmcblk0 rm 22; parted -s /dev/block/mmcblk0 rm 21;"
+    (void)system("adb shell \"parted -s /dev/block/mmcblk0 rm 22; parted -s /dev/block/mmcblk0 rm 21;"
                        "parted -s /dev/block/mmcblk0 rm 20 \"");
 
 }
@@ -713,11 +713,11 @@ void OTools::prepareDevice4PartitionUpdate() {
 /* Used to do the postpartitioning update... */
 void OTools::postPartitionProcessing() {
     /* Format the newly created partitions as needed with sdcard as fat32 */
-    system("adb shell \"mke2fs -t ext4 -m 0 -L userdata /dev/block/mmcblk0p20;"
+    (void)system("adb shell \"mke2fs -t ext4 -m 0 -L userdata /dev/block/mmcblk0p20;"
                        "tune2fs -c 0 -i -1 -C -1 /dev/block/mmcblk0p20;"
                        "mke2fs -t ext4 -m 0 -L persist /dev/block/mmcblk0p21;"
                        "tune2fs -c 0 -i -1 -C -1 /dev/block/mmcblk0p21 \"");
-    system("adb shell \"mke2fs -t ext4 -m 0 -L cache /dev/block/mmcblk0p22;"
+    (void)system("adb shell \"mke2fs -t ext4 -m 0 -L cache /dev/block/mmcblk0p22;"
                        "tune2fs -c 0 -i -1 -C -1 /dev/block/mmcblk0p22;"
                        "mke2fs -t ext4 -m 0 -L sdcard /dev/block/mmcblk0p29;"
                        "tune2fs -c 0 -i -1 -C -1 /dev/block/mmcblk0p29;"
@@ -725,9 +725,9 @@ void OTools::postPartitionProcessing() {
                        "mount -t vfat /dev/block/mmcblk0p29 /sdcard \"");
 
     /* Now restore /persist partition */
-    system("adb push find5/mmcblk0p21_persist_ext4.img /sdcard/");
-    system("adb push find5/recovery.img /sdcard/");
-    system("adb shell \"dd if=/sdcard/mmcblk0p21_persist_ext4.img of=/dev/block/mmcblk0p21;"
+    (void)system("adb push find5/mmcblk0p21_persist_ext4.img /sdcard/");
+    (void)system("adb push find5/recovery.img /sdcard/");
+    (void)system("adb shell \"dd if=/sdcard/mmcblk0p21_persist_ext4.img of=/dev/block/mmcblk0p21;"
                        "dd if=/sdcard/recovery.img of=/dev/block/mmcblk0p24; \"");
 }
 
@@ -753,19 +753,19 @@ Code:
 28      16384000s  16449535s  65536s                  reserve4
 29      16449536s  61071326s  44621791s  fat32        sdcard
 */
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 15171583s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 15171583s;"
                                "parted -s /dev/block/mmcblk0 name 20 userdata;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 15171584s 15187967s;"
                                "parted -s /dev/block/mmcblk0 name 21 persist;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 15187968s 16236543s;"
                                "parted -s /dev/block/mmcblk0 name 22 cache \"");
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 16236544s 16238591s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 16236544s 16238591s;"
                                "parted -s /dev/block/mmcblk0 name 23 misc;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 16252928s 16273407s;"
                                "parted -s /dev/block/mmcblk0 name 24 recovery;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 16285696s 16351231s;"
                                "parted -s /dev/block/mmcblk0 name 25 reserve1 \"");
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 16351232s 16367615s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 16351232s 16367615s;"
                                "parted -s /dev/block/mmcblk0 name 26 reserve2;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 16367616s 16383999s;"
                                "parted -s /dev/block/mmcblk0 name 27 reserve3;"
@@ -790,19 +790,19 @@ Code:
 28      18481152s  18546687s  65536s                  reserve4
 29      18546688s  61071326s  42524639s  fat32        sdcard
 */
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 17268735s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 17268735s;"
                                "parted -s /dev/block/mmcblk0 name 20 userdata;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 17268736s 17285119s;"
                                "parted -s /dev/block/mmcblk0 name 21 persist;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 17285120s 18333695s;"
                                "parted -s /dev/block/mmcblk0 name 22 cache \"");
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 18333696s 18335743s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 18333696s 18335743s;"
                                "parted -s /dev/block/mmcblk0 name 23 misc;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 18350080s 18370559s;"
                                "parted -s /dev/block/mmcblk0 name 24 recovery;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 18382848s 18448383s;"
                                "parted -s /dev/block/mmcblk0 name 25 reserve1 \"");
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 18448384s 18464767s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 18448384s 18464767s;"
                                "parted -s /dev/block/mmcblk0 name 26 reserve2;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 18464768s 18481151s;"
                                "parted -s /dev/block/mmcblk0 name 27 reserve3;"
@@ -827,19 +827,19 @@ Code:
 28      20578304s  20643839s  65536s                  reserve4
 29      20643840s  61071326s  40427487s  fat32        sdcard
 */
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 19365887s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 19365887s;"
                                "parted -s /dev/block/mmcblk0 name 20 userdata;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 19365888s 19382271s;"
                                "parted -s /dev/block/mmcblk0 name 21 persist;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 19382272s 20430847s;"
                                "parted -s /dev/block/mmcblk0 name 22 cache \"");
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 20430848s 20432895s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 20430848s 20432895s;"
                                "parted -s /dev/block/mmcblk0 name 23 misc;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 20447232s 20467711s;"
                                "parted -s /dev/block/mmcblk0 name 24 recovery;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 20480000s 20545535s;"
                                "parted -s /dev/block/mmcblk0 name 25 reserve1 \"");
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 20545536s 20561919s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 20545536s 20561919s;"
                                "parted -s /dev/block/mmcblk0 name 26 reserve2;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 20561920s 20578303s;"
                                "parted -s /dev/block/mmcblk0 name 27 reserve3;"
@@ -864,19 +864,19 @@ Code:
 28      22675456s  22740991s  65536s                  reserve4
 29      22740992s  61071326s  38330335s  fat32        sdcard
 */
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 21463039s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 21463039s;"
                                "parted -s /dev/block/mmcblk0 name 20 userdata;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 21463040s 21479423s;"
                                "parted -s /dev/block/mmcblk0 name 21 persist;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 21479424s 22527999s;"
                                "parted -s /dev/block/mmcblk0 name 22 cache \"");
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 22528000s 22530047s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 22528000s 22530047s;"
                                "parted -s /dev/block/mmcblk0 name 23 misc;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 22544384s 22564863s;"
                                "parted -s /dev/block/mmcblk0 name 24 recovery;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 22577152s 22642687s;"
                                "parted -s /dev/block/mmcblk0 name 25 reserve1 \"");
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 22642688s 22659071s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 22642688s 22659071s;"
                                "parted -s /dev/block/mmcblk0 name 26 reserve2;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 22659072s 22675455s;"
                                "parted -s /dev/block/mmcblk0 name 27 reserve3;"
@@ -901,19 +901,19 @@ Code:
 28      24772608s  24838143s  65536s                  reserve4
 29      24838144s  61071326s  36233183s  fat32        sdcard
 */
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 23560191s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 23560191s;"
                                "parted -s /dev/block/mmcblk0 name 20 userdata;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 23560192s 23576575s;"
                                "parted -s /dev/block/mmcblk0 name 21 persist;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 23576576s 24625151s;"
                                "parted -s /dev/block/mmcblk0 name 22 cache \"");
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 24625152s 24627199s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 24625152s 24627199s;"
                                "parted -s /dev/block/mmcblk0 name 23 misc;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 24641536s 24662015s;"
                                "parted -s /dev/block/mmcblk0 name 24 recovery;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 24674304s 24739839s;"
                                "parted -s /dev/block/mmcblk0 name 25 reserve1 \"");
-            system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 24739840s 24756223s;"
+            (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 24739840s 24756223s;"
                                "parted -s /dev/block/mmcblk0 name 26 reserve2;"
                                "parted -s /dev/block/mmcblk0 mkpart primary 24756224s 24772607s;"
                                "parted -s /dev/block/mmcblk0 name 27 reserve3;"
@@ -938,19 +938,19 @@ Code:
 28      7995392s  8060927s   65536s                  reserve4
 29      8060928s  61071326s  53010399s  fat32        sdcard
 */
-        system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 6782975s;"
+        (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 2588672s 6782975s;"
                            "parted -s /dev/block/mmcblk0 name 20 userdata;"
                            "parted -s /dev/block/mmcblk0 mkpart primary 6782976s 6799359s;"
                            "parted -s /dev/block/mmcblk0 name 21 persist;"
                            "parted -s /dev/block/mmcblk0 mkpart primary 6799360s 7847935s;"
                            "parted -s /dev/block/mmcblk0 name 22 cache \"");
-        system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 7847936s 7849983s;"
+        (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 7847936s 7849983s;"
                            "parted -s /dev/block/mmcblk0 name 23 misc;"
                            "parted -s /dev/block/mmcblk0 mkpart primary 7864320s 7884799s;"
                            "parted -s /dev/block/mmcblk0 name 24 recovery;"
                            "parted -s /dev/block/mmcblk0 mkpart primary 7897088s 7962623s;"
                            "parted -s /dev/block/mmcblk0 name 25 reserve1 \"");
-        system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 7962624s 7979007s;"
+        (void)system("adb shell \"parted -s /dev/block/mmcblk0 mkpart primary 7962624s 7979007s;"
                            "parted -s /dev/block/mmcblk0 name 26 reserve2;"
                            "parted -s /dev/block/mmcblk0 mkpart primary 7979008s 7995391s;"
                            "parted -s /dev/block/mmcblk0 name 27 reserve3;"
