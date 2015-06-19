@@ -2,6 +2,8 @@
 #define OTOOLS_H
 
 #include <QMainWindow>
+#include <QProcessEnvironment>
+#include <QObject>
 
 namespace Ui {
 class OTools;
@@ -18,21 +20,21 @@ public:
 private slots:
     void on_BackupB_clicked();
 
-    void on_Select_clicked();
+//    void on_Select_clicked();
 
-    void on_bacon_clicked();
+//    void on_bacon_clicked();
 
-    void on_find7_clicked();
+//    void on_find7_clicked();
 
-    void on_find5_clicked();
+//    void on_find5_clicked();
 
-    void on_n1_clicked();
+//    void on_n1_clicked();
 
     void on_RestoreB_clicked();
 
-    void on_SelectF_clicked(bool checked);
+//    void on_SelectF_clicked(bool checked);
 
-    void on_SelectF_clicked();
+//    void on_SelectF_clicked();
 
     void on_actionDisclaimer_triggered();
 
@@ -40,9 +42,9 @@ private slots:
 
     void on_actionUpdate_triggered();
 
-    void on_SelectBack_clicked();
+//    void on_SelectBack_clicked();
 
-    void on_SelectPull_clicked();
+//    void on_SelectPull_clicked();
 
     void on_PushB_clicked();
 
@@ -76,7 +78,7 @@ private slots:
 
     void on_ApkB_clicked();
 
-    void on_StartB_clicked();
+//    void on_StartB_clicked();
 
     void on_n1R_clicked();
 
@@ -88,8 +90,19 @@ private slots:
 
     void on_RootC_clicked();
 
+    void on_IncreaseSystemPartion_toggled(bool checked);
+
+    void on_btnGrowParitionExecute_clicked();
+
 private:
     Ui::OTools *ui;
+
+    void postPartitionProcessing();
+    void prepareDevice4PartitionUpdate();
+
+#ifdef __WIN32__
+    QProcessEnvironment env;
+#endif
 };
 
 #endif // OTOOLS_H
